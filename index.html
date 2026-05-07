@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="AI가 분석하는 정밀 사주풀이. 당신만의 운명 이야기를 들려드립니다.">
+<title>사주마미 - AI 정밀 사주풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: #fef5f8; }
+  body {
+    font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    color: #2c2c2a;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display-font { font-family: 'Nanum Myeongjo', serif; }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #fef5f8;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 80px;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid #f0d6e8;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #c05a8a;
+    letter-spacing: -0.5px;
+  }
+  .logo .heart { color: #d4537e; font-size: 12px; vertical-align: middle; margin: 0 2px; }
+  .topbar-icons { display: flex; gap: 18px; color: #c05a8a; font-size: 19px; }
+
+  .hero {
+    margin: 14px 14px 8px;
+    background: linear-gradient(135deg, #fff 0%, #fff5f9 100%);
+    border-radius: 20px;
+    padding: 26px 20px 22px;
+    border: 0.5px solid #f0d6e8;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(237,147,177,0.18), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #fbeaf0; color: #993556;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 11px; border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+    position: relative;
+  }
+  .hero-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 19px; font-weight: 800;
+    color: #2c2c2a; line-height: 1.5;
+    letter-spacing: -0.3px;
+    position: relative;
+  }
+  .hero-sub {
+    font-size: 12px; color: #888780;
+    margin-top: 8px; line-height: 1.6;
+    position: relative;
+  }
+
+  .form-card {
+    margin: 12px 14px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px 16px;
+    border: 0.5px solid #f0d6e8;
+  }
+  .form-title {
+    font-size: 13px; font-weight: 700;
+    color: #c05a8a; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 9px; }
+  .inp-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .inp-label {
+    font-size: 11px; color: #888780; font-weight: 600;
+    padding-left: 3px; letter-spacing: 0.2px;
+  }
+  input, select {
+    height: 42px;
+    border: 0.5px solid #e8c4d8;
+    border-radius: 11px;
+    padding: 0 13px;
+    font-size: 14px;
+    background: #fff;
+    color: #2c2c2a;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  input:focus, select:focus {
+    border-color: #d4537e;
+    box-shadow: 0 0 0 3px rgba(212,83,126,0.1);
+  }
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c05a8a' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 32px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #c05a8a 0%, #d4537e 100%);
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    letter-spacing: -0.2px;
+    font-family: inherit;
+    transition: transform 0.1s, opacity 0.2s;
+    box-shadow: 0 4px 14px rgba(192,90,138,0.25);
+  }
+  .cta-btn:active:not(:disabled) { transform: scale(0.98); }
+  .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  .err {
+    color: #a32d2d;
+    background: #fcebeb;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 9px;
+    margin-top: 8px;
+    display: none;
+    text-align: center;
+  }
+
+  .loading-area {
+    margin: 16px 14px;
+    padding: 28px 16px;
+    text-align: center;
+    background: #fff;
+    border: 0.5px solid #f0d6e8;
+    border-radius: 18px;
+    display: none;
+  }
+  .loading-icon {
+    font-size: 28px; color: #d4537e;
+    margin-bottom: 12px;
+    animation: spin 2.5s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .loading-txt {
+    font-size: 14px;
+    color: #444441;
+    font-weight: 600;
+  }
+  .loading-sub {
+    font-size: 11px; color: #888780;
+    margin-top: 5px;
+  }
+
+  .result { margin: 0 14px; display: none; }
+
+  .res-hero {
+    background: linear-gradient(160deg, #fff 0%, #ffeef5 100%);
+    border: 0.5px solid #f0d6e8;
+    border-radius: 20px;
+    padding: 22px 18px;
+    margin-bottom: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .sparkle-icon { font-size: 22px; color: #d4537e; margin-bottom: 8px; display: inline-block; }
+  .res-headline {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 17px; font-weight: 800;
+    color: #2c2c2a; line-height: 1.6;
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+  }
+
+  .pillars-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .pillar-box {
+    background: #fff;
+    border: 0.5px solid #f0d6e8;
+    border-radius: 12px;
+    padding: 10px 4px 8px;
+    text-align: center;
+  }
+  .pillar-label {
+    font-size: 10px;
+    color: #993556;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+  }
+  .pillar-chars {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #2c2c2a;
+    line-height: 1.25;
+  }
+  .pillar-oh {
+    font-size: 10px;
+    color: #c05a8a;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  .ohaeng-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .oh-pill {
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .oh-목 { background: #eaf3de; color: #27500a; }
+  .oh-화 { background: #fcebeb; color: #791f1f; }
+  .oh-토 { background: #faeeda; color: #633806; }
+  .oh-금 { background: #f1efe8; color: #2c2c2a; }
+  .oh-수 { background: #e6f1fb; color: #042c53; }
+
+  .intro-card {
+    background: #fff;
+    border: 0.5px solid #f0d6e8;
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 14px;
+    font-size: 14.5px;
+    color: #2c2c2a;
+    line-height: 1.85;
+    letter-spacing: -0.2px;
+  }
+
+  .sec-label {
+    padding: 14px 4px 8px;
+    font-size: 11px;
+    color: #888780;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .acc {
+    background: #fff;
+    border: 0.5px solid #f0d6e8;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .acc.open { border-color: #ed93b1; }
+  .acc-h {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 15px 14px;
+    cursor: pointer;
+  }
+  .acc-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #fbeaf0;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+    color: #c05a8a;
+  }
+  .acc-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2c2c2a;
+    flex: 1;
+    line-height: 1.45;
+    letter-spacing: -0.2px;
+  }
+  .acc-arrow {
+    color: #d4537e;
+    font-size: 14px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .acc.open .acc-arrow { transform: rotate(180deg); }
+  .acc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 14px;
+    font-size: 13.5px;
+    color: #444441;
+    line-height: 1.85;
+    letter-spacing: -0.2px;
+  }
+  .acc.open .acc-body { max-height: 500px; padding-bottom: 16px; }
+
+  .promo-card {
+    margin-top: 18px;
+    background: linear-gradient(135deg, #fff5f9 0%, #fde4ed 100%);
+    border: 0.5px solid #f0d6e8;
+    border-radius: 16px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .promo-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 15px; font-weight: 800;
+    color: #72243e; margin-bottom: 6px;
+  }
+  .promo-sub { font-size: 12px; color: #888780; margin-bottom: 12px; line-height: 1.6; }
+  .promo-btn {
+    display: inline-block;
+    background: #fff; color: #c05a8a;
+    border: 0.5px solid #ed93b1;
+    border-radius: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .footer-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 0.5px solid #f0d6e8;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 14px;
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: #888780;
+    font-size: 10px;
+    cursor: pointer;
+    flex: 1;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .nav-item i { font-size: 20px; }
+  .nav-item.active { color: #c05a8a; }
+  .nav-item.center {
+    background: linear-gradient(135deg, #c05a8a, #d4537e);
+    color: #fff;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    margin-top: -22px;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(192,90,138,0.35);
+  }
+  .nav-item.center i { font-size: 22px; }
+  .nav-item.center span { display: none; }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <span class="logo">사주마미<span class="heart"><i class="ti ti-heart-filled"></i></span></span>
+    <div class="topbar-icons">
+      <i class="ti ti-bell" aria-hidden="true"></i>
+      <i class="ti ti-menu-2" aria-hidden="true"></i>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag"><i class="ti ti-sparkles" style="font-size:11px"></i> AI 정밀 사주 분석</div>
+    <div class="hero-title">당신만을 위한<br>운명의 이야기</div>
+    <div class="hero-sub">생년월일과 시간으로 풀어낸<br>나만의 사주명리 풀이</div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-title"><i class="ti ti-id"></i> 정보 입력</div>
+    <div class="form-row">
+      <div class="inp-wrap">
+        <span class="inp-label">이름</span>
+        <input type="text" id="f-name" placeholder="홍길동" maxlength="20">
+      </div>
+      <div class="inp-wrap">
+        <span class="inp-label">성별</span>
+        <select id="f-gender">
+          <option value="남">남성</option>
+          <option value="여">여성</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="inp-wrap">
+        <span class="inp-label">태어난 년도</span>
+        <input type="number" id="f-year" placeholder="1990" min="1900" max="2100" inputmode="numeric">
+      </div>
+      <div class="inp-wrap">
+        <span class="inp-label">월 (1~12)</span>
+        <input type="number" id="f-month" placeholder="5" min="1" max="12" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="inp-wrap">
+        <span class="inp-label">일 (1~31)</span>
+        <input type="number" id="f-day" placeholder="15" min="1" max="31" inputmode="numeric">
+      </div>
+      <div class="inp-wrap">
+        <span class="inp-label">시 (0~23, 모르면 빈칸)</span>
+        <input type="number" id="f-hour" placeholder="14" min="0" max="23" inputmode="numeric">
+      </div>
+    </div>
+    <div class="err" id="err"></div>
+    <button class="cta-btn" id="btn" onclick="startAnalysis()">
+      <i class="ti ti-wand" style="margin-right:6px"></i>내 사주 분석 시작하기
+    </button>
+  </div>
+
+  <div class="loading-area" id="loading">
+    <div class="loading-icon"><i class="ti ti-loader-2"></i></div>
+    <div class="loading-txt" id="ltxt">사주팔자를 계산하는 중...</div>
+    <div class="loading-sub">잠시만 기다려주세요</div>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<nav class="footer-nav">
+  <button class="nav-item active"><i class="ti ti-home"></i><span>홈</span></button>
+  <button class="nav-item"><i class="ti ti-user-plus"></i><span>사주추가</span></button>
+  <button class="nav-item center"><i class="ti ti-sparkles"></i></button>
+  <button class="nav-item"><i class="ti ti-message-circle"></i><span>상담</span></button>
+  <button class="nav-item"><i class="ti ti-bookmark"></i><span>보관함</span></button>
+</nav>
+
+<script>
+const CG = ['갑','을','병','정','무','기','경','신','임','계'];
+const JJ = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const CG_OH = ['목','목','화','화','토','토','금','금','수','수'];
+const JJ_OH = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+
+function dateToJde(y, m, d, frac=0) {
+  let yr=y, mo=m;
+  if (mo<=2) { yr--; mo+=12; }
+  const A = Math.floor(yr/100);
+  const B = 2 - A + Math.floor(A/4);
+  return Math.floor(365.25*(yr+4716)) + Math.floor(30.6001*(mo+1)) + d + frac + B - 1524.5;
+}
+function getSunLon(jde) {
+  const T = (jde-2451545)/36525;
+  const L0 = 280.46646 + 36000.76983*T + 0.0003032*T*T;
+  const M = 357.52911 + 35999.05029*T - 0.0001537*T*T;
+  const Mr = M*Math.PI/180;
+  const C = (1.914602-0.004817*T-0.000014*T*T)*Math.sin(Mr)
+          + (0.019993-0.000101*T)*Math.sin(2*Mr)
+          + 0.000289*Math.sin(3*Mr);
+  const sl = L0 + C;
+  const om = 125.04 - 1934.136*T;
+  const lam = sl - 0.00569 - 0.00478*Math.sin(om*Math.PI/180);
+  return ((lam%360)+360)%360;
+}
+function termJde(year, lon) {
+  let jde = 2451545 + 365.25*(year-2000) + (lon/360)*365.2422;
+  for (let i=0; i<60; i++) {
+    let diff = lon - getSunLon(jde);
+    if (diff>180) diff-=360;
+    if (diff<-180) diff+=360;
+    const d = diff*(365.2422/360);
+    jde += d;
+    if (Math.abs(d)<0.0001) break;
+  }
+  return jde;
+}
+const MONTH_LONS = [315,345,15,45,75,105,135,165,195,225,255,285];
+const M_JI_MAP = [2,3,4,5,6,7,8,9,10,11,0,1];
+
+function getMonthIdx(year, month, day, hour) {
+  const inputJde = dateToJde(year, month, day, hour<0 ? 0.5 : hour/24);
+  let terms = [];
+  for (let y=year-1; y<=year+1; y++) {
+    MONTH_LONS.forEach((lon, i) => terms.push({jde: termJde(y, lon), i}));
+  }
+  terms.sort((a,b) => a.jde - b.jde);
+  let last = terms[0];
+  for (const t of terms) {
+    if (t.jde <= inputJde) last = t;
+    else break;
+  }
+  return last.i;
+}
+function getYearPillar(year, month, day, hour) {
+  const inputJde = dateToJde(year, month, day, hour<0 ? 0.5 : hour/24);
+  const ipchun = termJde(year, 315);
+  const useYear = inputJde < ipchun ? year-1 : year;
+  const idx = ((useYear-4)%60+60)%60;
+  return { gan: idx%10, ji: idx%12 };
+}
+function getDayPillar(year, month, day) {
+  const jde = dateToJde(year, month, day);
+  const base = 2451920;
+  const diff = Math.floor(jde+0.5) - base;
+  const idx = ((diff%60)+60)%60;
+  return { gan: idx%10, ji: idx%12 };
+}
+function getMonthGan(yGan, mIdx) {
+  return ([2,4,6,8,0][yGan%5] + mIdx) % 10;
+}
+function getHourPillar(hour, dGan) {
+  if (hour<0) return null;
+  const ji = hour>=23 || hour<1 ? 0 : Math.floor((hour+1)/2);
+  const gan = ([0,2,4,6,8][dGan%5] + ji) % 10;
+  return { gan, ji };
+}
+function calculateSaju(year, month, day, hour) {
+  const yp = getYearPillar(year, month, day, hour);
+  const mIdx = getMonthIdx(year, month, day, hour);
+  const mJi = M_JI_MAP[mIdx];
+  const mGan = getMonthGan(yp.gan, mIdx);
+  const dp = getDayPillar(year, month, day);
+  const hp = getHourPillar(hour, dp.gan);
+  return [
+    { label: '년주', gan: yp.gan, ji: yp.ji },
+    { label: '월주', gan: mGan, ji: mJi },
+    { label: '일주', gan: dp.gan, ji: dp.ji },
+    { label: '시주', gan: hp ? hp.gan : null, ji: hp ? hp.ji : null }
+  ];
+}
+function ohaengCount(pillars) {
+  const c = { '목':0, '화':0, '토':0, '금':0, '수':0 };
+  pillars.forEach(p => {
+    if (p.gan !== null) {
+      c[CG_OH[p.gan]]++;
+      c[JJ_OH[p.ji]]++;
+    }
+  });
+  return c;
+}
+
+const LMSGS = [
+  '사주팔자를 계산하는 중...',
+  '천간지지를 배열하는 중...',
+  '오행의 흐름을 분석하는 중...',
+  'AI가 당신의 운명을 읽는 중...',
+  '맞춤 해석을 생성하는 중...'
+];
+
+function toggleAcc(headerEl) {
+  const acc = headerEl.parentElement;
+  acc.classList.toggle('open');
+}
+
+async function startAnalysis() {
+  const name = document.getElementById('f-name').value.trim();
+  const gender = document.getElementById('f-gender').value;
+  const year = parseInt(document.getElementById('f-year').value);
+  const month = parseInt(document.getElementById('f-month').value);
+  const day = parseInt(document.getElementById('f-day').value);
+  const hourVal = document.getElementById('f-hour').value.trim();
+  const hour = hourVal === '' ? -1 : parseInt(hourVal);
+
+  const errEl = document.getElementById('err');
+  errEl.style.display = 'none';
+
+  if (!name) return showErr('이름을 입력해주세요.');
+  if (!year || !month || !day || isNaN(year) || isNaN(month) || isNaN(day))
+    return showErr('생년월일을 올바르게 입력해주세요.');
+  if (year<1900 || year>2100) return showErr('1900~2100년 범위만 지원합니다.');
+  if (month<1 || month>12) return showErr('월은 1~12 사이로 입력해주세요.');
+  if (day<1 || day>31) return showErr('일은 1~31 사이로 입력해주세요.');
+  if (hour !== -1 && (isNaN(hour) || hour<0 || hour>23))
+    return showErr('시간은 0~23 사이로 입력하거나 비워두세요.');
+
+  document.getElementById('btn').disabled = true;
+  document.getElementById('result').style.display = 'none';
+  const ld = document.getElementById('loading');
+  ld.style.display = 'block';
+  const lt = document.getElementById('ltxt');
+  let li = 0;
+  const timer = setInterval(() => { lt.textContent = LMSGS[++li % LMSGS.length]; }, 1400);
+
+  try {
+    const pillars = calculateSaju(year, month, day, hour);
+    const oh = ohaengCount(pillars);
+    const sajuStr = pillars.map(p =>
+      p.gan!==null ? `${p.label}: ${CG[p.gan]}${JJ[p.ji]}(${CG_OH[p.gan]},${JJ_OH[p.ji]})` : `${p.label}: 미입력`
+    ).join(' / ');
+    const ohStr = Object.entries(oh).filter(([,v])=>v>0).map(([k,v])=>`${k}${v}`).join(' ');
+
+    const aiData = await fetchAI({ name, gender, year, month, day, hour, sajuStr, ohStr });
+    clearInterval(timer);
+    ld.style.display = 'none';
+    renderResult(name, pillars, oh, aiData);
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    clearInterval(timer);
+    ld.style.display = 'none';
+    showErr('분석 오류: ' + e.message);
+  } finally {
+    document.getElementById('btn').disabled = false;
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function fetchAI(data) {
+  const res = await fetch('/api/saju.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`서버 응답 ${res.status}: ${err.substring(0, 100)}`);
+  }
+  const result = await res.json();
+  if (result.error) throw new Error(result.error);
+  return result;
+}
+
+function renderResult(name, pillars, oh, ai) {
+  const pillarsHtml = pillars.map(p => {
+    if (p.gan === null) {
+      return `<div class="pillar-box"><div class="pillar-label">${p.label}</div><div style="font-size:11px;color:#c05a8a;padding:6px 0">미입력</div></div>`;
+    }
+    return `<div class="pillar-box">
+      <div class="pillar-label">${p.label}</div>
+      <div class="pillar-chars">${CG[p.gan]}<br>${JJ[p.ji]}</div>
+      <div class="pillar-oh">${CG_OH[p.gan]}·${JJ_OH[p.ji]}</div>
+    </div>`;
+  }).join('');
+
+  const ohHtml = Object.entries(oh).filter(([,v])=>v>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([k,v]) => `<span class="oh-pill oh-${k}">${k} ${v}</span>`)
+    .join('');
+
+  const sectionIcons = ['sparkles', 'briefcase', 'heart', 'coin', 'activity', 'calendar-event'];
+  const sectionsHtml = (ai.sections || []).map((s, i) => {
+    const icon = s.icon || sectionIcons[i] || 'star';
+    return `<div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">
+        <div class="acc-icon"><i class="ti ti-${icon}" aria-hidden="true"></i></div>
+        <div class="acc-title">${escapeHtml(s.title)}</div>
+        <span class="acc-arrow"><i class="ti ti-chevron-down" aria-hidden="true"></i></span>
+      </div>
+      <div class="acc-body">${escapeHtml(s.content)}</div>
+    </div>`;
+  }).join('');
+
+  const el = document.getElementById('result');
+  el.innerHTML = `
+    <div class="res-hero">
+      <div class="sparkle-icon"><i class="ti ti-sparkles" aria-hidden="true"></i></div>
+      <div class="res-headline">${escapeHtml(ai.headline || '당신만의 특별한 사주')}</div>
+      <div class="pillars-row">${pillarsHtml}</div>
+      <div class="ohaeng-row">${ohHtml}</div>
+    </div>
+    <div class="intro-card">${escapeHtml(ai.intro || '')}</div>
+    <div class="sec-label">나의 사주 이야기</div>
+    ${sectionsHtml}
+    <div class="promo-card">
+      <div class="promo-title">더 깊은 분석이 궁금하신가요?</div>
+      <div class="promo-sub">대운, 세운, 궁합까지<br>전문가 1:1 상담을 받아보세요</div>
+      <button class="promo-btn" onclick="alert('결제 페이지 연동 예정')">프리미엄 상담 신청 →</button>
+    </div>
+  `;
+  el.style.display = 'block';
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+</script>
+
+</body>
+</html>
